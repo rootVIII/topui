@@ -10,9 +10,9 @@ import (
 
 // TopUI represents the main application window.
 type TopUI struct {
-	window *widgets.QMainWindow
-	// inputTextBox              *widgets.QLineEdit
+	window        *widgets.QMainWindow
 	intervalLabel *widgets.QLabel
+	listBox       *widgets.QListWidget
 }
 
 // reset the gui and variables to inital/empty values.
@@ -26,9 +26,7 @@ func (t *TopUI) updateUI() {
 
 }
 
-// RunApp runs the GUI version of the app. Check for new jobs and process
-// found jobs in a single background goroutine to prevent the hanging GUI
-// and possible spinning beach-ball for larger-sized PDFs.
+// RunApp initializes the GUI and all associated GUI types.
 func (t *TopUI) RunApp() {
 
 	ui := widgets.NewQApplication(len(os.Args), os.Args)
@@ -48,22 +46,21 @@ func (t *TopUI) RunApp() {
 	timer1.ConnectTimeout(func() { t.updateUI() })
 	timer1.Start(1000)
 
-	title := widgets.NewQGraphicsScene(nil)
+	title := widgets.NewQGraphicsScene(t.window)
 	title.AddText("t e m p", gui.NewQFont2("Menlo", 20, 1, false))
-	titleView := widgets.NewQGraphicsView(nil)
+	titleView := widgets.NewQGraphicsView(t.window)
 	titleView.SetScene(title)
 
-	tempLabel := widgets.NewQLabel(nil, 0)
-	tempLabel.SetText("placeholder for horizontal 2")
+	t.listBox = widgets.NewQListWidget(t.window)
 
-	t.intervalLabel = widgets.NewQLabel(nil, 0)
+	t.intervalLabel = widgets.NewQLabel(t.window, 0)
 	t.intervalLabel.SetText("g r e e t i n g s")
 
 	intervalButton := widgets.NewQPushButton2("Browse", nil)
 	intervalButton.ConnectClicked(func(bool) { t.updateUI() })
 
 	h1.Layout().AddWidget(titleView)
-	h2.Layout().AddWidget(tempLabel)
+	h2.Layout().AddWidget(t.listBox)
 	h3.Layout().AddWidget(intervalButton)
 	h3.Layout().AddWidget(t.intervalLabel)
 
