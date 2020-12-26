@@ -10,9 +10,8 @@ import (
 
 // TopUI represents the main application window.
 type TopUI struct {
-	window        *widgets.QMainWindow
-	intervalLabel *widgets.QLabel
-	listBox       *widgets.QListWidget
+	window  *widgets.QMainWindow
+	listBox *widgets.QListWidget
 }
 
 // reset the gui and variables to inital/empty values.
@@ -50,20 +49,20 @@ func (t *TopUI) RunApp() {
 	title.AddText("t e m p", gui.NewQFont2("Menlo", 15, 1, false))
 	titleView := widgets.NewQGraphicsView(t.window)
 	titleView.SetScene(title)
+	titleView.SetFixedHeight(30)
+
+	heading1 := widgets.NewQLabel(t.window, 0)
+	heading1.SetText("CPU\tName")
+	heading2 := widgets.NewQLabel(t.window, 0)
+	heading2.SetText("\tetc\tetc")
 
 	t.listBox = widgets.NewQListWidget(t.window)
-	t.listBox.SetFixedHeight(525)
-
-	t.intervalLabel = widgets.NewQLabel(t.window, 0)
-	t.intervalLabel.SetText("g r e e t i n g s")
-
-	intervalButton := widgets.NewQPushButton2("Browse", nil)
-	intervalButton.ConnectClicked(func(bool) { t.updateUI() })
+	t.listBox.SetFixedHeight(570)
 
 	h1.Layout().AddWidget(titleView)
-	h2.Layout().AddWidget(t.listBox)
-	h3.Layout().AddWidget(intervalButton)
-	h3.Layout().AddWidget(t.intervalLabel)
+	h2.Layout().AddWidget(heading1)
+	h2.Layout().AddWidget(heading2)
+	h3.Layout().AddWidget(t.listBox)
 
 	for _, layout := range []*widgets.QHBoxLayout{h1, h2, h3} {
 		v.AddLayout(layout, 0)
