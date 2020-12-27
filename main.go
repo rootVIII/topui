@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -38,30 +37,34 @@ func (t *TopUI) RunApp() {
 	h1 := widgets.NewQHBoxLayout()
 	h2 := widgets.NewQHBoxLayout()
 	h3 := widgets.NewQHBoxLayout()
-
 	v := widgets.NewQVBoxLayout()
 
 	timer1 := core.NewQTimer(t.window)
 	timer1.ConnectTimeout(func() { t.updateUI() })
 	timer1.Start(1000)
 
-	title := widgets.NewQGraphicsScene(t.window)
-	title.AddText("t e m p", gui.NewQFont2("Menlo", 15, 1, false))
-	titleView := widgets.NewQGraphicsView(t.window)
-	titleView.SetScene(title)
-	titleView.SetFixedHeight(30)
-
 	heading1 := widgets.NewQLabel(t.window, 0)
-	heading1.SetText("CPU\tName")
+	heading1.SetText("PID")
 	heading2 := widgets.NewQLabel(t.window, 0)
-	heading2.SetText("\tetc\tetc")
+	heading2.SetText("CPU%")
+	heading3 := widgets.NewQLabel(t.window, 0)
+	heading3.SetText("MEMORY")
+	heading4 := widgets.NewQLabel(t.window, 0)
+	heading4.SetText("UID")
+
+	divider := widgets.NewQGraphicsScene(t.window)
+	titleView := widgets.NewQGraphicsView(t.window)
+	titleView.SetScene(divider)
+	titleView.SetFixedHeight(2)
 
 	t.listBox = widgets.NewQListWidget(t.window)
-	t.listBox.SetFixedHeight(570)
+	t.listBox.SetFixedHeight(600)
 
-	h1.Layout().AddWidget(titleView)
-	h2.Layout().AddWidget(heading1)
-	h2.Layout().AddWidget(heading2)
+	h1.Layout().AddWidget(heading1)
+	h1.Layout().AddWidget(heading2)
+	h1.Layout().AddWidget(heading3)
+	h1.Layout().AddWidget(heading4)
+	h2.Layout().AddWidget(titleView)
 	h3.Layout().AddWidget(t.listBox)
 
 	for _, layout := range []*widgets.QHBoxLayout{h1, h2, h3} {
