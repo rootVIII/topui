@@ -18,15 +18,8 @@ type TopUI struct {
 	cmdBuffer bytes.Buffer
 }
 
-// reset the gui and variables to inital/empty values.
-func (t *TopUI) reset() {
-
-	// t.inputTextBox.SetText(t.PDFIn)
-	t.window.SetWindowTitle("")
-}
-
 func (t *TopUI) updateUI() {
-	fmt.Printf("S T A R T\n\n")
+	fmt.Printf("\n\nS T A R T\n\n")
 	fmt.Printf("%q\n", t.cmdBuffer.String())
 	t.cmdBuffer.Reset()
 }
