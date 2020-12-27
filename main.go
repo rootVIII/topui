@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
@@ -9,8 +13,9 @@ import (
 
 // TopUI represents the main application window.
 type TopUI struct {
-	window  *widgets.QMainWindow
-	listBox *widgets.QListWidget
+	window    *widgets.QMainWindow
+	listBox   *widgets.QListWidget
+	cmdBuffer bytes.Buffer
 }
 
 // reset the gui and variables to inital/empty values.
@@ -22,6 +27,21 @@ func (t *TopUI) reset() {
 
 func (t *TopUI) updateUI() {
 
+}
+
+func (t *TopUI) execTop() {
+	command := exec.Command("top")
+	stdout, err := command.StdoutPipe()
+	if err != nil {
+		panic(err)
+	}
+	if err := command.Start(); err != nil {
+		panic(err)
+	}
+	scanner := bufio.NewScanner(stdout)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
 }
 
 // RunApp initializes the GUI and all associated GUI types.
@@ -79,7 +99,15 @@ func (t *TopUI) RunApp() {
 }
 
 func main() {
-
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(fmt.Errorf("error: %v", err))
+			os.Exit(1)
+		}
+	}()
 	var ui = &TopUI{}
+
+	ui.execTop()
+
 	ui.RunApp()
 }
