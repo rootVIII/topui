@@ -30,7 +30,7 @@ func (t *TopUI) scanSTDOUT(scanner *bufio.Scanner) {
 	}
 }
 
-func (t *TopUI) execTop() (*bufio.Scanner, error) {
+func (t TopUI) execTop() (*bufio.Scanner, error) {
 	command := exec.Command("top")
 	stdout, err := command.StdoutPipe()
 
