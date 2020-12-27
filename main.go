@@ -24,25 +24,33 @@ func (t *TopUI) updateUI() {
 	t.cmdBuffer.Reset()
 }
 
-func (t *TopUI) execTop() {
-	command := exec.Command("top")
-	stdout, err := command.StdoutPipe()
-	if err != nil {
-		panic(err)
-	}
-	if err := command.Start(); err != nil {
-		panic(err)
-	}
-	scanner := bufio.NewScanner(stdout)
+func (t *TopUI) scanSTDOUT(scanner *bufio.Scanner) {
 	for scanner.Scan() {
 		t.cmdBuffer.Write(scanner.Bytes())
 	}
 }
 
+func (t *TopUI) execTop() (*bufio.Scanner, error) {
+	command := exec.Command("top")
+	stdout, err := command.StdoutPipe()
+
+	if err != nil {
+		return nil, err
+	}
+	if err := command.Start(); err != nil {
+		return nil, err
+	}
+	return bufio.NewScanner(stdout), nil
+}
+
 // RunApp initializes the GUI and all associated GUI types.
 func (t *TopUI) RunApp() {
+	scanner, err := t.execTop()
+	if err != nil {
+		panic(err)
+	}
 
-	go t.execTop()
+	go t.scanSTDOUT(scanner)
 
 	ui := widgets.NewQApplication(len(os.Args), os.Args)
 
@@ -105,10 +113,11 @@ func (t *TopUI) RunApp() {
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println(fmt.Errorf("error: %v", err))
+			fmt.Println(fmt.Errorf("an error occurred: %v", err))
 			os.Exit(1)
 		}
 	}()
+
 	var topUI = &TopUI{}
 	topUI.RunApp()
 }
