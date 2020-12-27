@@ -26,7 +26,9 @@ func (t *TopUI) reset() {
 }
 
 func (t *TopUI) updateUI() {
-
+	fmt.Printf("S T A R T\n\n")
+	fmt.Printf("%q\n", t.cmdBuffer.String())
+	t.cmdBuffer.Reset()
 }
 
 func (t *TopUI) execTop() {
@@ -40,19 +42,21 @@ func (t *TopUI) execTop() {
 	}
 	scanner := bufio.NewScanner(stdout)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		t.cmdBuffer.Write(scanner.Bytes())
 	}
 }
 
 // RunApp initializes the GUI and all associated GUI types.
 func (t *TopUI) RunApp() {
 
+	go t.execTop()
+
 	ui := widgets.NewQApplication(len(os.Args), os.Args)
 
 	t.window = widgets.NewQMainWindow(nil, 0)
 	t.window.SetMinimumSize2(450, 675)
 	t.window.SetMaximumSize2(450, 675)
-	t.window.SetWindowTitle("Top UI")
+	t.window.SetWindowTitle("Top Process Monitor")
 
 	h1 := widgets.NewQHBoxLayout()
 	h2 := widgets.NewQHBoxLayout()
@@ -64,13 +68,19 @@ func (t *TopUI) RunApp() {
 	timer1.Start(1000)
 
 	heading1 := widgets.NewQLabel(t.window, 0)
-	heading1.SetText("PID")
+	heading1.SetText("PID") // 0
+
 	heading2 := widgets.NewQLabel(t.window, 0)
-	heading2.SetText("CPU%")
+	heading2.SetText("Program%") // 1
+
 	heading3 := widgets.NewQLabel(t.window, 0)
-	heading3.SetText("MEMORY")
+	heading3.SetText("CPU%") // 2
+
 	heading4 := widgets.NewQLabel(t.window, 0)
-	heading4.SetText("UID")
+	heading4.SetText("MEMORY") // 7
+
+	heading5 := widgets.NewQLabel(t.window, 0)
+	heading5.SetText("UID") // 16
 
 	divider := widgets.NewQGraphicsScene(t.window)
 	titleView := widgets.NewQGraphicsView(t.window)
@@ -84,6 +94,7 @@ func (t *TopUI) RunApp() {
 	h1.Layout().AddWidget(heading2)
 	h1.Layout().AddWidget(heading3)
 	h1.Layout().AddWidget(heading4)
+	h1.Layout().AddWidget(heading5)
 	h2.Layout().AddWidget(titleView)
 	h3.Layout().AddWidget(t.listBox)
 
@@ -105,9 +116,6 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-	var ui = &TopUI{}
-
-	ui.execTop()
-
-	ui.RunApp()
+	var topUI = &TopUI{}
+	topUI.RunApp()
 }
