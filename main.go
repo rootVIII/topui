@@ -2,10 +2,11 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
@@ -15,18 +16,30 @@ import (
 type TopUI struct {
 	window    *widgets.QMainWindow
 	listBox   *widgets.QListWidget
-	cmdBuffer bytes.Buffer
+	cmdBuffer []string
 }
 
 func (t *TopUI) updateUI() {
-	fmt.Printf("\n\nS T A R T\n\n")
-	fmt.Printf("%q\n", t.cmdBuffer.String())
-	t.cmdBuffer.Reset()
+	if len(t.cmdBuffer) > 0 {
+		t.listBox.Clear()
+		t.listBox.AddItems(t.cmdBuffer)
+		t.cmdBuffer = nil
+	}
 }
 
 func (t *TopUI) scanSTDOUT(scanner *bufio.Scanner) {
 	for scanner.Scan() {
-		t.cmdBuffer.Write(scanner.Bytes())
+		line := strings.Fields(scanner.Text())
+		if len(line) > 0 {
+			if _, err := strconv.Atoi(line[0]); err == nil {
+				if line[1] != "top" && line[1] != "topui" {
+					t.cmdBuffer = append(
+						t.cmdBuffer,
+						fmt.Sprintf("%s %s %s %s %s", line[0], line[1], line[2], line[7], line[16]),
+					)
+				}
+			}
+		}
 	}
 }
 
@@ -72,7 +85,7 @@ func (t *TopUI) RunApp() {
 	heading1.SetText("PID") // 0
 
 	heading2 := widgets.NewQLabel(t.window, 0)
-	heading2.SetText("Program%") // 1
+	heading2.SetText("App") // 1
 
 	heading3 := widgets.NewQLabel(t.window, 0)
 	heading3.SetText("CPU%") // 2
