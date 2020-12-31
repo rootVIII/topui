@@ -12,6 +12,8 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
+// 2020 rootVIII - List top processes in a simple QT GUI
+
 // TopUI represents the main application window.
 type TopUI struct {
 	window    *widgets.QMainWindow
