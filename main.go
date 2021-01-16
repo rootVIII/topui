@@ -70,9 +70,9 @@ func (t TopUI) execTop() (*bufio.Scanner, error) {
 
 func (t *TopUI) setWindow() {
 	t.window = widgets.NewQMainWindow(nil, 0)
-	t.window.SetMinimumSize2(480, 675)
-	t.window.SetMaximumSize2(480, 675)
-	t.window.SetWindowTitle("💻 ")
+	t.window.SetMinimumSize2(480, 685)
+	t.window.SetMaximumSize2(480, 685)
+	t.window.SetWindowTitle("💻")
 }
 
 func (t *TopUI) setTitle() {
@@ -85,7 +85,7 @@ func (t *TopUI) setTitle() {
 
 func (t *TopUI) setTable() {
 	t.tableBox = widgets.NewQTableWidget(t.window)
-	t.tableBox.SetFixedHeight(610)
+	t.tableBox.SetFixedHeight(620)
 	t.tableBox.SetColumnCount(3)
 	t.rowMax = 500
 	t.tableBox.SetRowCount(t.rowMax + 1)
