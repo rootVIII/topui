@@ -9,11 +9,7 @@
         The GUI auto-updates in real-time every few seconds.
     </li>
     <li>
-        There is a notarized/verified installer in
-    <a href="https://github.com/rootVIII/topui/releases">releases</a>.
-    </li>
-    <li>
-      Otherwise Golang is required to install/build the program:<br>
+      Golang is required to install/build the program:<br>
       <code>go get -v github.com/rootVIII/topui</code> & <code>go build/install github.com/rootVIII/topui</code>
     </li>
 </ul>
