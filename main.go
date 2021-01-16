@@ -18,7 +18,6 @@ import (
 type TopUI struct {
 	window   *widgets.QMainWindow
 	tableBox *widgets.QTableWidget
-	cols     [][]string
 }
 
 func (t *TopUI) scanSTDOUT(scanner *bufio.Scanner) {
@@ -28,10 +27,9 @@ func (t *TopUI) scanSTDOUT(scanner *bufio.Scanner) {
 		if len(line) > 0 {
 			if _, err := strconv.Atoi(line[0]); err == nil {
 				if line[1] != "top" && line[1] != "topui" {
-					t.cols = append(t.cols, []string{line[0], line[1], line[2]})
-					t.tableBox.InsertRow(index)
-
-					t.tableBox.SetItem(index, 0, line[0])
+					t.tableBox.SetItem(index, 0, widgets.NewQTableWidgetItem2(line[0], 0))
+					t.tableBox.SetItem(index, 1, widgets.NewQTableWidgetItem2(line[1], 1))
+					t.tableBox.SetItem(index, 2, widgets.NewQTableWidgetItem2(line[2], 2))
 					index++
 				}
 			} else {
@@ -68,7 +66,7 @@ func (t *TopUI) RunApp() {
 	t.window = widgets.NewQMainWindow(nil, 0)
 	t.window.SetMinimumSize2(480, 675)
 	t.window.SetMaximumSize2(480, 675)
-	t.window.SetWindowTitle("Top CPU Usage")
+	t.window.SetWindowTitle("💻")
 
 	h1 := widgets.NewQHBoxLayout()
 	h2 := widgets.NewQHBoxLayout()
@@ -82,7 +80,7 @@ func (t *TopUI) RunApp() {
 	t.tableBox = widgets.NewQTableWidget(t.window)
 	t.tableBox.SetFixedHeight(625)
 	t.tableBox.SetColumnCount(3)
-	t.tableBox.SetRowCount(1)
+	t.tableBox.SetRowCount(500)
 	t.tableBox.SetHorizontalHeaderLabels([]string{"PID", "CPU%", "APP"})
 	t.tableBox.VerticalHeader().Hide()
 	t.tableBox.SetColumnWidth(0, 80)
