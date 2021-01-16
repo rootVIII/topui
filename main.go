@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -127,6 +128,9 @@ func (t *TopUI) buildApp() {
 }
 
 // RunApp initializes the GUI and all associated GUI types.
+// Stdout from top bin is scanned in goroutine, written
+// to a buffer, and then the buffer is emptied and used
+// to populate the GUI within a QTimed method.
 func (t *TopUI) RunApp() {
 	ui := widgets.NewQApplication(len(os.Args), os.Args)
 	t.buildApp()
@@ -139,6 +143,26 @@ func (t *TopUI) RunApp() {
 	go t.scanSTDOUT(scanner)
 
 	ui.Exec()
+}
+
+func init() {
+	pathVar := os.Getenv("PATH")
+	if len(pathVar) < 1 {
+		log.Fatal("no $PATH variables found")
+	}
+
+	foundTop := false
+	for _, path := range strings.Split(pathVar, ":") {
+		_, err := os.Stat(filepath.Join(path, "top"))
+		if err == nil {
+			foundTop = true
+			break
+		}
+	}
+
+	if !foundTop {
+		log.Fatal("top executable not found in $PATH")
+	}
 }
 
 func main() {
