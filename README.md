@@ -18,9 +18,9 @@
     </li>
 </ul>
 
-<img src="https://github.com/rootVIII/topui/blob/master/s.png" alt="screenshot"><br>
+<img src="https://github.com/rootVIII/topui/blob/master/sc.png" alt="screenshot"><br>
 
 <hr>
 This was developed on Ubuntu MacOS Big Sur.
-<hr>
+<br><br>
 <b>Author: rootVIII 2021</b><br>
