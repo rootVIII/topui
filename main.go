@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -16,26 +18,51 @@ import (
 
 // TopUI represents the main application window.
 type TopUI struct {
-	window   *widgets.QMainWindow
-	tableBox *widgets.QTableWidget
+	window    *widgets.QMainWindow
+	tableBox  *widgets.QTableWidget
+	cmdBuffer [][]string
 }
 
+// func (t *TopUI) scanSTDOUT(scanner *bufio.Scanner) {
+// 	var index int
+// 	for scanner.Scan() {
+// 		line := strings.Fields(scanner.Text())
+// 		if len(line) > 0 {
+// 			if _, err := strconv.Atoi(line[0]); err == nil {
+// 				if line[1] != "top" && line[1] != "topui" {
+// 					t.tableBox.SetItem(index, 0, widgets.NewQTableWidgetItem2(line[0], 0))
+// 					t.tableBox.SetItem(index, 1, widgets.NewQTableWidgetItem2(line[2], 0))
+// 					t.tableBox.SetItem(index, 2, widgets.NewQTableWidgetItem2(line[1], 0))
+// 					index++
+// 				}
+// 			} else {
+// 				index = 0
+// 			}
+// 		}
+// 	}
+// }
+
 func (t *TopUI) scanSTDOUT(scanner *bufio.Scanner) {
-	var index int
 	for scanner.Scan() {
 		line := strings.Fields(scanner.Text())
 		if len(line) > 0 {
 			if _, err := strconv.Atoi(line[0]); err == nil {
 				if line[1] != "top" && line[1] != "topui" {
-					t.tableBox.SetItem(index, 0, widgets.NewQTableWidgetItem2(line[0], 0))
-					t.tableBox.SetItem(index, 1, widgets.NewQTableWidgetItem2(line[1], 1))
-					t.tableBox.SetItem(index, 2, widgets.NewQTableWidgetItem2(line[2], 2))
-					index++
+					t.cmdBuffer = append(t.cmdBuffer, []string{line[0], line[2], line[1]})
 				}
-			} else {
-				index = 0
 			}
 		}
+	}
+}
+
+func (t *TopUI) unloadBuffer() {
+	if len(t.cmdBuffer) > 0 {
+		for index, line := range t.cmdBuffer {
+			t.tableBox.SetItem(index, 0, widgets.NewQTableWidgetItem2(line[0], 0))
+			t.tableBox.SetItem(index, 1, widgets.NewQTableWidgetItem2(line[1], 0))
+			t.tableBox.SetItem(index, 2, widgets.NewQTableWidgetItem2(line[2], 0))
+		}
+		t.cmdBuffer = nil
 	}
 }
 
@@ -66,19 +93,20 @@ func (t *TopUI) RunApp() {
 	t.window = widgets.NewQMainWindow(nil, 0)
 	t.window.SetMinimumSize2(480, 675)
 	t.window.SetMaximumSize2(480, 675)
-	t.window.SetWindowTitle("💻")
+	t.window.SetWindowTitle("💻 ")
 
 	h1 := widgets.NewQHBoxLayout()
 	h2 := widgets.NewQHBoxLayout()
 	v := widgets.NewQVBoxLayout()
 
-	divider := widgets.NewQGraphicsScene(t.window)
+	title := widgets.NewQGraphicsScene(t.window)
+	title.AddText("Top Processes", gui.NewQFont2("Menlo", 12, 1, false))
 	titleView := widgets.NewQGraphicsView(t.window)
-	titleView.SetScene(divider)
-	titleView.SetFixedHeight(2)
+	titleView.SetScene(title)
+	titleView.SetFixedHeight(30)
 
 	t.tableBox = widgets.NewQTableWidget(t.window)
-	t.tableBox.SetFixedHeight(625)
+	t.tableBox.SetFixedHeight(610)
 	t.tableBox.SetColumnCount(3)
 	t.tableBox.SetRowCount(500)
 	t.tableBox.SetHorizontalHeaderLabels([]string{"PID", "CPU%", "APP"})
@@ -98,6 +126,11 @@ func (t *TopUI) RunApp() {
 	widget.SetLayout(v)
 	t.window.SetCentralWidget(widget)
 	t.window.Show()
+
+	timer := core.NewQTimer(t.window)
+	timer.ConnectTimeout(func() { t.unloadBuffer() })
+	timer.Start(1000)
+
 	ui.Exec()
 }
 
